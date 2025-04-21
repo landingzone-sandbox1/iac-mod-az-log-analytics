@@ -4,16 +4,6 @@ variable "location" {
   nullable    = false
 }
 
-variable "name" {
-  type        = string
-  description = "Specifies the name of the Log Analytics Workspace. Changing this forces a new resource to be created."
-  nullable    = false
-
-  validation {
-    condition     = can(regex("^[A-Za-z0-9][A-Za-z0-9-]{2,61}[A-Za-z0-9]$", var.name))
-    error_message = "The name must be a valid Log Analytics Workspace name."
-  }
-}
 variable "region_code" {
   description = "Short code representing the Azure region (e.g., eus2 for East US 2)."
   type        = string
