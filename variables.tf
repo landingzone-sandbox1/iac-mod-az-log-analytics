@@ -14,7 +14,31 @@ variable "name" {
     error_message = "The name must be a valid Log Analytics Workspace name."
   }
 }
+variable "region_code" {
+  description = "Short code representing the Azure region (e.g., eus2 for East US 2)."
+  type        = string
+}
 
+variable "app_code" {
+  description = "Short application code used in naming convention."
+  type        = string
+}
+
+variable "objective" {
+  description = "A short objective or purpose code for the resource (e.g., core, mgmt)."
+  type        = string
+}
+
+variable "environment" {
+  description = "The environment for deployment (e.g., dev, qa, prod)."
+  type        = string
+}
+
+variable "correlative" {
+  description = "An optional correlative ID to differentiate between similar resources."
+  type        = string
+  default     = "01"
+}
 # This is required for most resource modules
 variable "resource_group_name" {
   type        = string

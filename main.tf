@@ -1,6 +1,6 @@
 resource "azurerm_log_analytics_workspace" "this" {
   location                           = var.location
-  name                               = var.name
+  name = "${local.service_code}${var.region_code}${var.app_code}${var.objective}${var.environment}${var.correlative}"
   resource_group_name                = var.resource_group_name
   allow_resource_only_permissions    = var.log_analytics_workspace_allow_resource_only_permissions
   cmk_for_query_forced               = var.log_analytics_workspace_cmk_for_query_forced
@@ -31,4 +31,4 @@ resource "azurerm_log_analytics_workspace" "this" {
       update = timeouts.value.update
     }
   }
-}
+} 
