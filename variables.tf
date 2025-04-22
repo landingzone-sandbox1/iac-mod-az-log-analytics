@@ -137,7 +137,7 @@ variable "log_analytics_workspace_cmk_for_query_forced" {
 
 variable "log_analytics_workspace_daily_quota_gb" {
   type        = number
-  default     = null
+  default     = -1
   description = "(Optional) The workspace daily quota for ingestion in GB. Defaults to -1 (unlimited) if omitted."
 }
 
@@ -179,13 +179,13 @@ variable "log_analytics_workspace_reservation_capacity_in_gb_per_day" {
 
 variable "log_analytics_workspace_retention_in_days" {
   type        = number
-  default     = null
-  description = "(Optional) The workspace data retention in days. Possible values are either 7 (Free Tier only) or range between 30 and 730."
+  default     = 90
+  description = "(Optional) The workspace data retention in days. Possible values are either 7 (Free Tier only) or range between 30 and 730. all analytics logs, with segu nomenclature set retention to 365 days:"
 }
 
 variable "log_analytics_workspace_sku" {
   type        = string
-  default     = null
+  default     = "PerGB2018"
   description = "(Optional) Specifies the SKU of the Log Analytics Workspace. Possible values are `Free`, `PerNode`, `Premium`, `Standard`, `Standalone`, `Unlimited`, `CapacityReservation`, and `PerGB2018` (new SKU as of `2018-04-03`). Defaults to `PerGB2018`."
 }
 
