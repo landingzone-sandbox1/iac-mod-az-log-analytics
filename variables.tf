@@ -9,12 +9,12 @@ variable "region_code" {
   type        = string
 }
 
-variable "app_code" {
+variable "application_code" {
   description = "Short application code used in naming convention."
   type        = string
 }
 
-variable "objective" {
+variable "objective_code" {
   description = "A short objective or purpose code for the resource (e.g., core, mgmt)."
   type        = string
 }
