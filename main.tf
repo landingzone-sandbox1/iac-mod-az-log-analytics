@@ -1,6 +1,6 @@
 resource "azurerm_log_analytics_workspace" "this" {
   location                           = var.location
-  name = "${local.service_code}${var.region_code}${var.application_code}${var.objective_code}${var.environment}${var.correlative}"
+  name                               = "${local.service_code}${var.region_code}${var.application_code}${var.objective_code}${var.environment}${var.correlative}"
   resource_group_name                = var.resource_group_name
   allow_resource_only_permissions    = var.log_analytics_workspace_allow_resource_only_permissions
   cmk_for_query_forced               = var.log_analytics_workspace_cmk_for_query_forced
