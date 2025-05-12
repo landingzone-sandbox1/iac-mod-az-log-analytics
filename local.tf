@@ -1,3 +1,3 @@
 locals {
-  service_code = "LAW" 
+  service_code = "LGAN"
 }

@@ -20,7 +20,7 @@ variable "objective_code" {
 }
 
 variable "environment" {
-  description = "The environment for deployment (e.g., dev, qa, prod)."
+  description = "The environment for deployment (e.g., D, P, C)."
   type        = string
 }
 
@@ -29,7 +29,7 @@ variable "correlative" {
   type        = string
   default     = "01"
 }
-# This is required for most resource modules
+
 variable "resource_group_name" {
   type        = string
   description = "(Required) Specifies the name of the Resource Group in which the Log Analytics Workspace should exist. Changing this forces a new resource to be created"
@@ -325,7 +325,6 @@ variable "role_assignments" {
   nullable    = false
 }
 
-# tflint-ignore: terraform_unused_declarations
 variable "tags" {
   type        = map(string)
   default     = null
