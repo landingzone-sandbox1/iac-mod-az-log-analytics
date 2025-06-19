@@ -19,10 +19,69 @@
 # Variables not sent:
 #   - name: The workspace name is derived within the module.
 
+terraform {
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "~> 3.0"
+    }
+  }
+}
+
+provider "azurerm" {
+  features {}
+}
+
+variable "location" {
+  description = "Azure region for the workspace."
+  type        = string
+  default     = "eastus2"
+}
+
+variable "region_code" {
+  description = "Short code for the Azure region (used in naming)."
+  type        = string
+  default     = "EU2"
+}
+
+variable "application_code" {
+  description = "Application identifier for naming and tagging."
+  type        = string
+  default     = "APP"
+}
+
+variable "objective_code" {
+  description = "Purpose of the workspace (e.g., monitoring, diagnostics)."
+  type        = string
+  default     = "CORE"
+}
+
+variable "environment" {
+  description = "Environment tag (e.g., dev, test, prod)."
+  type        = string
+  default     = "D"
+}
+
+variable "correlative" {
+  description = "Unique identifier or numeric suffix."
+  type        = string
+  default     = "01"
+}
+
+# Resource Group module (using Azure's official module as an example)
+module "azure_rg_example_for_law" {
+  source   = "git::ssh://git@github.com/landingzone-sandbox/iac-mod-az-resource-group.git"
+  version  = "3.0.0"
+  location = var.location
+  name     = "rg-${var.region_code}-${var.application_code}-${var.environment}-${var.objective_code}-${var.correlative}"
+}
+
+
 module "azure_log_analytics_example" {
   source              = "git::ssh://git@github.com/landingzone-sandbox/iac-mod-az-log-analytics.git?ref=v1"
-  location            = var.location
+  name                = local.name
   resource_group_name = module.azure_rg_example_for_law.name
+  location            = var.location
   region_code         = var.region_code
   application_code    = var.application_code
   objective_code      = var.objective_code

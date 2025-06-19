@@ -1,6 +1,6 @@
 resource "azurerm_log_analytics_workspace" "this" {
   location                           = var.location
-  name                               = "${local.service_code}${var.region_code}${var.application_code}${var.objective_code}${var.environment}${var.correlative}"
+  name                               = local.name
   resource_group_name                = var.resource_group_name
   allow_resource_only_permissions    = var.log_analytics_workspace_allow_resource_only_permissions
   cmk_for_query_forced               = var.log_analytics_workspace_cmk_for_query_forced
@@ -10,7 +10,7 @@ resource "azurerm_log_analytics_workspace" "this" {
   local_authentication_disabled      = var.log_analytics_workspace_local_authentication_disabled
   reservation_capacity_in_gb_per_day = var.log_analytics_workspace_reservation_capacity_in_gb_per_day
   retention_in_days                  = var.log_analytics_workspace_retention_in_days
-  sku                                = var.log_analytics_workspace_sku
+  sku                                = local.log_analytics_workspace_sku
   tags                               = var.tags
 
   dynamic "identity" {
