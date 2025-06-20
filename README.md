@@ -43,7 +43,6 @@ No modules.
 | <a name="input_log_analytics_workspace_timeouts"></a> [log\_analytics\_workspace\_timeouts](#input\_log\_analytics\_workspace\_timeouts) | - `create` - (Defaults to 30 minutes) Used when creating the Log Analytics Workspace.<br/> - `delete` - (Defaults to 30 minutes) Used when deleting the Log Analytics Workspace.<br/> - `read` - (Defaults to 5 minutes) Used when retrieving the Log Analytics Workspace.<br/> - `update` - (Defaults to 30 minutes) Used when updating the Log Analytics Workspace. | <pre>object({<br/>    create = optional(string)<br/>    delete = optional(string)<br/>    read   = optional(string)<br/>    update = optional(string)<br/>  })</pre> | `null` | no |
 | <a name="input_objective_code"></a> [objective\_code](#input\_objective\_code) | A short objective or purpose code for the resource (e.g., core, mgmt). | `string` | n/a | yes |
 | <a name="input_region_code"></a> [region\_code](#input\_region\_code) | Short code representing the Azure region (e.g., eus2 for East US 2). | `string` | n/a | yes |
-| <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | (Required) Specifies the name of the Resource Group in which the Log Analytics Workspace should exist. Changing this forces a new resource to be created | `string` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | (Optional) Tags of the resource. | `map(string)` | `null` | no |
 
 ## Outputs

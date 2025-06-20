@@ -30,11 +30,11 @@ variable "correlative" {
   default     = "01"
 }
 
-variable "resource_group_name" {
-  type        = string
-  description = "(Required) Specifies the name of the Resource Group in which the Log Analytics Workspace should exist. Changing this forces a new resource to be created"
-  nullable    = false
-}
+# variable "resource_group_name" {
+#   type        = string
+#   description = "(Required) Specifies the name of the Resource Group in which the Log Analytics Workspace should exist. Changing this forces a new resource to be created"
+#   nullable    = false
+# }
 
 # required AVM interfaces
 # remove only if not supported by the resource

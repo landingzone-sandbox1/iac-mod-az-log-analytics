@@ -6,6 +6,7 @@ locals {
   environment                 = var.environment
   correlative                 = var.correlative
   name                        = "${local.service_code}${local.region_code}${local.application_code}${local.objective_code}${local.environment}${local.correlative}"
+  resource_group_name         = "${local.service_code}${local.region_code}${local.application_code}${local.environment}${local.correlative}"
   log_analytics_workspace_sku = "PerGB2018"
 
 }
