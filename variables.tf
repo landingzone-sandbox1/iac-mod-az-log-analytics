@@ -101,18 +101,18 @@ variable "log_analytics_workspace_internet_query_enabled" {
   description = "(Required) Should the Log Analytics Workspace support querying over the Public Internet? Defaults to `False`."
 }
 
-variable "log_analytics_workspace_local_authentication_disabled" {
-  type        = bool
-  default     = null
-  description = "(Optional) Specifies if the log Analytics workspace should enforce authentication using Azure AD. Defaults to `false`."
-}
+# variable "log_analytics_workspace_local_authentication_disabled" {
+#   type        = bool
+#   default     = true
+#   description = "(Optional) Specifies if the log Analytics workspace should enforce authentication using Azure AD. Defaults to `false`."
+# }
 
 variable "log_analytics_workspace_reservation_capacity_in_gb_per_day" {
   type        = number
-  default     = null
+  default     = 100
   description = "(Optional) The capacity reservation level in GB for this workspace. Possible values are `100`, `200`, `300`, `400`, `500`, `1000`, `2000` and `5000`."
   validation {
-    condition     = var.log_analytics_workspace_reservation_capacity_in_gb_per_day == null || contains([100, 200, 300, 400, 500, 1000, 2000, 5000], var.log_analytics_workspace_reservation_capacity_in_gb_per_day)
+    condition     = var.log_analytics_workspace_reservation_capacity_in_gb_per_day == null ? true : contains([100, 200, 300, 400, 500, 1000, 2000, 5000], var.log_analytics_workspace_reservation_capacity_in_gb_per_day)
     error_message = "log_analytics_workspace_reservation_capacity_in_gb_per_day must be one of: 100, 200, 300, 400, 500, 1000, 2000, 5000, or null."
   }
 }
