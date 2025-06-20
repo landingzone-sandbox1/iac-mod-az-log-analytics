@@ -71,11 +71,11 @@ variable "log_analytics_workspace_cmk_for_query_forced" {
   description = "(Optional) Is Customer Managed Storage mandatory for query management?"
 }
 
-variable "log_analytics_workspace_daily_quota_gb" {
-  type        = number
-  default     = -1
-  description = "(Optional) The workspace daily quota for ingestion in GB. Defaults to -1 (unlimited) if omitted."
-}
+# variable "log_analytics_workspace_daily_quota_gb" {
+#   type        = number
+#   default     = -1
+#   description = "(Optional) The workspace daily quota for ingestion in GB. Defaults to -1 (unlimited) if omitted."
+# }
 
 variable "log_analytics_workspace_identity" {
   type = object({
@@ -117,15 +117,15 @@ variable "log_analytics_workspace_reservation_capacity_in_gb_per_day" {
   }
 }
 
-variable "log_analytics_workspace_retention_in_days" {
-  type        = number
-  default     = 90
-  description = "(Optional) The workspace data retention in days. Possible values are either 7 (Free Tier only) or range between 30 and 730. all analytics logs, with segu nomenclature set retention to 365 days:"
-  validation {
-    condition     = var.log_analytics_workspace_retention_in_days == 7 || (var.log_analytics_workspace_retention_in_days >= 30 && var.log_analytics_workspace_retention_in_days <= 730)
-    error_message = "Retention must be 7, or between 30 and 730."
-  }
-}
+# variable "log_analytics_workspace_retention_in_days" {
+#   type        = number
+#   default     = 90
+#   description = "(Optional) The workspace data retention in days. Possible values are either 7 (Free Tier only) or range between 30 and 730. all analytics logs, with segu nomenclature set retention to 365 days:"
+#   validation {
+#     condition     = var.log_analytics_workspace_retention_in_days == 7 || (var.log_analytics_workspace_retention_in_days >= 30 && var.log_analytics_workspace_retention_in_days <= 730)
+#     error_message = "Retention must be 7, or between 30 and 730."
+#   }
+# }
 
 variable "log_analytics_workspace_timeouts" {
   type = object({
