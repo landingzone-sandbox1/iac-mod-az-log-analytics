@@ -15,8 +15,13 @@ variable "application_code" {
 }
 
 variable "objective_code" {
-  description = "A short objective or purpose code for the resource (e.g., core, mgmt)."
+  description = "A 3 to 4 character code conveying a meaningful purpose for the resource (e.g., core, mgmt)."
   type        = string
+  validation {
+    condition     = var.objective_code == "" || can(regex("^[A-Za-z0-9]{3,4}$", var.objective_code))
+    error_message = "When provided, objective code must be 3 or 4 alphanumeric characters (letters or numbers). See: https://github.com/landingzone-sandbox/wiki-landing-zone/wiki/ALZ-+-GEN-IA-Landing-Zone-(MS-English)-(M1)---Resource-Organization-Naming-Convention-Standards"
+  }
+
 }
 
 variable "environment" {
