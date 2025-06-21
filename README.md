@@ -3,14 +3,14 @@
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.3 |
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 4.28.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.9 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 4.28 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.28.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.28 |
 
 ## Modules
 
@@ -20,7 +20,7 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [azurerm_log_analytics_workspace.this](https://registry.terraform.io/providers/hashicorp/azurerm/4.28.0/docs/resources/log_analytics_workspace) | resource |
+| [azurerm_log_analytics_workspace.this](https://registry.terraform.io/providers/hashicorp/azurerm/4.28/docs/resources/log_analytics_workspace) | resource |
 
 ## Inputs
 
