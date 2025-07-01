@@ -1,7 +1,7 @@
 resource "azurerm_log_analytics_workspace" "this" {
   location                        = var.location
   name                            = local.name
-  resource_group_name             = local.resource_group_name
+  resource_group_name             = var.resource_group_name
   allow_resource_only_permissions = var.log_analytics_workspace_allow_resource_only_permissions
   cmk_for_query_forced            = var.log_analytics_workspace_cmk_for_query_forced
   daily_quota_gb                  = local.log_analytics_workspace_daily_quota_gb
