@@ -75,6 +75,7 @@ locals {
   correlative                                           = "01"
   name                                                  = "${local.service_code}${local.region_code}${local.application_code}${local.objective_code}${local.environment}${local.correlative}"
   resource_group_name                                   = "${local.service_code_rg}${local.region_code}${local.application_code}${local.environment}${local.correlative}"
+  # resource_group_name follows the convention: RSG<region_code><application_code><environment><correlative>
   log_analytics_workspace_sku                           = "PerGB2018"
   log_analytics_workspace_daily_quota_gb                = -1
   log_analytics_workspace_retention_in_days             = var.objective_code == "SEGU" ? 365 : 90
@@ -95,14 +96,13 @@ module "azure_rg_example_for_law" {
 
 module "azure_log_analytics_example" {
   source                                         = "git::ssh://git@github.com/landingzone-sandbox/iac-mod-az-log-analytics.git"
-  resource_group_name                            = module.azure_rg_example_for_law.name
+  resource_group_name                            = local.resource_group_name
   location                                       = var.location
   region_code                                    = var.region_code
   application_code                               = var.application_code
   environment                                    = var.environment
   correlative                                    = var.correlative
   objective_code                                 = var.objective_code
-
 
   tags                                           = var.tags
   name                                           = local.name

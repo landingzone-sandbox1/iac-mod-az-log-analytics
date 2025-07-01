@@ -41,7 +41,7 @@ variable "resource_group_name" {
 
   validation {
     condition     = can(regex("^RSG[A-Za-z0-9]{3,4}[A-Za-z0-9]{4}[A-Za-z0-9]{1}[A-Za-z0-9]{2}$", var.resource_group_name))
-    error_message = "The resource_group_name must match the pattern: RSG<region_code(4)><application_code(4)><environment(1)><correlative(2)>, e.g., RSGeus2AP01D01"
+    error_message = "The resource_group_name must match the pattern: RSG<region_code(3,4)><application_code(4)><environment(1)><correlative(2)>, e.g., RSGeus2AP01D01"
   }
 }
 
