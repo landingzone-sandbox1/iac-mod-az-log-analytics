@@ -5,13 +5,21 @@ variable "location" {
 }
 
 variable "region_code" {
-  description = "Short code representing the Azure region (e.g., eus2 for East US 2)."
+  description = "Short region code for Azure resource naming, following ALZ naming conventions (e.g., 'eus', 'wus2', 'neu')."
   type        = string
+  validation {
+    condition     = can(regex("^[A-Za-z0-9]{2,5}$", var.region_code))
+    error_message = "region_code must be a valid ALZ short region code (e.g., 'eus', 'wus2', 'neu')."
+  }
 }
 
 variable "application_code" {
-  description = "Short application code used in naming convention."
+  description = "4-character application code, uppercase alphanumeric (e.g., MBBK for Mobile Banking). Must comply with ALZ naming conventions."
   type        = string
+  validation {
+    condition     = can(regex("^[A-Z0-9]{4}$", var.application_code))
+    error_message = "application_code must be exactly 4 uppercase alphanumeric characters (A-Z, 0-9) per ALZ naming conventions."
+  }
 }
 
 variable "objective_code" {
@@ -71,14 +79,30 @@ DESCRIPTION
 
 variable "log_analytics_workspace_allow_resource_only_permissions" {
   type        = bool
-  default     = null
-  description = "(Optional) Specifies if the log Analytics Workspace allow users accessing to data associated with resources they have permission to view, without permission to workspace. Defaults to `true`."
+  default     = false
+  description = <<DESC
+(Optional) Specifies if the Log Analytics Workspace allows users to access data associated with resources they have permission to view, without permission to the workspace. 
+Defaults to `false` for security. Set to `true` only if required for your scenario.
+DESC
+  nullable    = false
+  validation {
+    condition     = var.log_analytics_workspace_allow_resource_only_permissions == true || var.log_analytics_workspace_allow_resource_only_permissions == false
+    error_message = "Value must be true or false. Default is false for security."
+  }
 }
 
 variable "log_analytics_workspace_cmk_for_query_forced" {
   type        = bool
-  default     = null
-  description = "(Optional) Is Customer Managed Storage mandatory for query management?"
+  default     = false
+  description = <<DESC
+(Optional) If set to true, forces Customer Managed Key (CMK) for query management in the Log Analytics Workspace.
+Defaults to false for compatibility and to avoid accidental access issues. Set to true only if your compliance or security policy requires it and you have configured a CMK.
+DESC
+  nullable    = false
+  validation {
+    condition     = var.log_analytics_workspace_cmk_for_query_forced == true || var.log_analytics_workspace_cmk_for_query_forced == false
+    error_message = "Value must be true or false. Default is false for safety and compatibility."
+  }
 }
 
 # variable "log_analytics_workspace_daily_quota_gb" {
