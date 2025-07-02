@@ -66,54 +66,56 @@ variable "correlative" {
 }
 
 locals {
-  service_code                                          = "LAW"
-  service_code_rg                                       = "RSG"
-  region_code                                           = "eus2"
-  application_code                                      = "AP01"
-  objective_code                                        = "MON"
-  environment                                           = "D"
-  correlative                                           = "01"
-  name                                                  = "${local.service_code}${local.region_code}${local.application_code}${local.objective_code}${local.environment}${local.correlative}"
-  resource_group_name                                   = "${local.service_code_rg}${local.region_code}${local.application_code}${local.environment}${local.correlative}"
+  service_code                 = "LAW"
+  service_code_rg              = "RSG"
+  region_code                  = "eus2"
+  application_code             = "AP01"
+  objective_code               = "MON"
+  environment                  = "D"
+  correlative                  = "01"
+  log_analytics_workspace_name = lower("${local.service_code}${local.region_code}${local.application_code}${local.environment}${local.correlative}")
+  resource_group_name          = "${local.service_code_rg}${local.region_code}${local.application_code}${local.environment}${local.correlative}"
   # resource_group_name follows the convention: RSG<region_code><application_code><environment><correlative>
   log_analytics_workspace_sku                           = "PerGB2018"
   log_analytics_workspace_daily_quota_gb                = -1
   log_analytics_workspace_retention_in_days             = var.objective_code == "SEGU" ? 365 : 90
   log_analytics_workspace_local_authentication_disabled = true
+  # --- RBAC/Role Definitions ---
+  role_definition_resource_substring = "/providers/microsoft.authorization/roledefinitions/"
 }
 
 # Resource Group module
 module "azure_rg_example_for_law" {
-  source            = "git::ssh://git@github.com/landingzone-sandbox/iac-mod-az-resource-group.git"
-  location          = var.location
-  application_code  = var.application_code
-  region_code       = var.region_code
-  correlative       = var.correlative
-  environment       = var.environment
-  tags              = var.tags
-  name              = local.resource_group_name
+  source           = "git::ssh://git@github.com/landingzone-sandbox/iac-mod-az-resource-group.git"
+  location         = var.location
+  application_code = var.application_code
+  region_code      = var.region_code
+  correlative      = var.correlative
+  environment      = var.environment
+  tags             = var.tags
+  name             = local.resource_group_name
 }
 
 module "azure_log_analytics_example" {
-  source                                         = "git::ssh://git@github.com/landingzone-sandbox/iac-mod-az-log-analytics.git"
-  resource_group_name                            = local.resource_group_name
-  location                                       = var.location
-  region_code                                    = var.region_code
-  application_code                               = var.application_code
-  environment                                    = var.environment
-  correlative                                    = var.correlative
-  objective_code                                 = var.objective_code
+  source              = "git::ssh://git@github.com/landingzone-sandbox/iac-mod-az-log-analytics.git"
+  resource_group_name = local.resource_group_name
+  location            = var.location
+  region_code         = var.region_code
+  application_code    = var.application_code
+  environment         = var.environment
+  correlative         = var.correlative
+  objective_code      = var.objective_code
 
-  tags                                           = var.tags
-  name                                           = local.name
-  log_analytics_workspace_sku                    = local.log_analytics_workspace_sku
-  log_analytics_workspace_daily_quota_gb         = local.log_analytics_workspace_daily_quota_gb
-  log_analytics_workspace_retention_in_days      = local.log_analytics_workspace_retention_in_days
-  log_analytics_workspace_local_authentication_disabled = local.log_analytics_workspace_local_authentication_disabled
+  tags                                                    = var.tags
+  name                                                    = local.name
+  log_analytics_workspace_sku                             = local.log_analytics_workspace_sku
+  log_analytics_workspace_daily_quota_gb                  = local.log_analytics_workspace_daily_quota_gb
+  log_analytics_workspace_retention_in_days               = local.log_analytics_workspace_retention_in_days
+  log_analytics_workspace_local_authentication_disabled   = local.log_analytics_workspace_local_authentication_disabled
   log_analytics_workspace_allow_resource_only_permissions = var.log_analytics_workspace_allow_resource_only_permissions
-  log_analytics_workspace_cmk_for_query_forced   = var.log_analytics_workspace_cmk_for_query_forced
-  log_analytics_workspace_internet_ingestion_enabled = var.log_analytics_workspace_internet_ingestion_enabled
-  log_analytics_workspace_internet_query_enabled = var.log_analytics_workspace_internet_query_enabled
+  log_analytics_workspace_cmk_for_query_forced            = var.log_analytics_workspace_cmk_for_query_forced
+  log_analytics_workspace_internet_ingestion_enabled      = var.log_analytics_workspace_internet_ingestion_enabled
+  log_analytics_workspace_internet_query_enabled          = var.log_analytics_workspace_internet_query_enabled
 }
 
 # Outputs

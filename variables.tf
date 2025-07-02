@@ -27,6 +27,7 @@ variable "objective_code" {
 variable "environment" {
   description = "The environment for deployment (e.g., D, P, C)."
   type        = string
+  nullable    = false
 }
 
 variable "correlative" {
@@ -35,15 +36,15 @@ variable "correlative" {
   default     = "01"
 }
 
-variable "resource_group_name" {
-  description = "The name of the Azure Resource Group in which the Log Analytics Workspace should exist."
-  type        = string
+# variable "resource_group_name" {
+#   description = "The name of the Azure Resource Group in which the Log Analytics Workspace should exist."
+#   type        = string
 
-  validation {
-    condition     = can(regex("^RSG[A-Za-z0-9]{3,4}[A-Za-z0-9]{4}[A-Za-z0-9]{1}[A-Za-z0-9]{2}$", var.resource_group_name))
-    error_message = "The resource_group_name must match the pattern: RSG<region_code(3,4)><application_code(4)><environment(1)><correlative(2)>, e.g., RSGeus2AP01D01"
-  }
-}
+#   validation {
+#     condition     = can(regex("^RSG[A-Za-z0-9]{3,4}[A-Za-z0-9]{4}[A-Za-z0-9]{1}[A-Za-z0-9]{2}$", var.resource_group_name))
+#     error_message = "The resource_group_name must match the pattern: RSG<region_code(3,4)><application_code(4)><environment(1)><correlative(2)>, e.g., RSGeus2AP01D01"
+#   }
+# }
 
 # required AVM interfaces
 # remove only if not supported by the resource
@@ -140,6 +141,68 @@ variable "tags" {
   type        = map(string)
   default     = null
   description = "(Optional) Tags of the resource."
+}
+
+# Consolidated network and RBAC settings as an object input variable
+variable "network_and_rbac_settings" {
+  description = <<-EOT
+    Network and RBAC configuration for the log analytics workspace.
+    - firewall_ips: List of allowed IPv4 addresses for the log analytics workspace firewall.
+    - vnet_subnet_ids: List of allowed Azure subnet resource IDs.
+    - role_assignments: Map of RBAC role assignments (see below for structure).
+    Each role assignment value must specify:
+      - role_definition_id_or_name: The ID or name of the role definition to assign.
+      - principal_id: The object ID of the principal (user, group, or service principal).
+      - principal_type: Must be either "ServicePrincipal" or "ManagedIdentity".
+      Optional fields:
+        - description
+        - skip_service_principal_aad_check
+        - condition
+        - condition_version
+        - delegated_managed_identity_resource_id
+  EOT
+  type = object({
+    firewall_ips    = optional(list(string), [])
+    vnet_subnet_ids = optional(list(string), [])
+    role_assignments = optional(map(object({
+      role_definition_id_or_name             = string
+      principal_id                           = string
+      principal_type                         = string
+      description                            = optional(string, null)
+      skip_service_principal_aad_check       = optional(bool, false)
+      condition                              = optional(string, null)
+      condition_version                      = optional(string, null)
+      delegated_managed_identity_resource_id = optional(string, null)
+    })), {})
+  })
+  nullable = false
+  validation {
+    condition = (
+      alltrue([
+        for ip in coalesce(var.network_and_rbac_settings.firewall_ips, []) : can(regex("^([0-9]{1,3}\\.){3}[0-9]{1,3}$", ip))
+      ])
+    )
+    error_message = "Each firewall IP must be a valid IPv4 address."
+  }
+  validation {
+    condition = (
+      alltrue([
+        for id in coalesce(var.network_and_rbac_settings.vnet_subnet_ids, []) : can(regex("^/subscriptions/.+/resourceGroups/.+/providers/Microsoft.Network/virtualNetworks/.+/subnets/.+$", id))
+      ])
+    )
+    error_message = "Each subnet ID must be a valid Azure subnet resource ID."
+  }
+  validation {
+    condition = (
+      length(coalesce(var.network_and_rbac_settings.role_assignments, {})) == 0 ||
+      alltrue([
+        for ra in values(var.network_and_rbac_settings.role_assignments) : (
+          contains(["ServicePrincipal", "ManagedIdentity"], ra.principal_type)
+        )
+      ])
+    )
+    error_message = "If set, all role assignments must have principal_type set to 'ServicePrincipal' or 'ManagedIdentity'."
+  }
 }
 
 # Variables to be configured in furture releases of this module.
