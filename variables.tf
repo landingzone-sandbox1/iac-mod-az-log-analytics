@@ -1,17 +1,19 @@
 variable "location" {
   type        = string
-  description = "(Required) Specifies the suppored Azure location where the Log Analytics Workspace should exist. Changing this forces a new resource to be created"
+  description = "Required. The Azure region for deployment of this resource."
   nullable    = false
-}
 
-variable "region_code" {
-  description = "Short region code for Azure resource naming, following ALZ naming conventions (e.g., 'eus', 'wus2', 'neu')."
-  type        = string
   validation {
-    condition     = can(regex("^[A-Za-z0-9]{2,5}$", var.region_code))
-    error_message = "region_code must be a valid ALZ short region code (e.g., 'eus', 'wus2', 'neu')."
+    condition     = length(trim(var.location, " ")) > 0
+    error_message = "The location must not be empty."
+  }
+
+  validation {
+    condition     = contains(keys(local.location_to_region_code), var.location)
+    error_message = "The location must be one of the supported Azure regions: ${join(", ", keys(local.location_to_region_code))}."
   }
 }
+
 
 variable "application_code" {
   description = "4-character application code, uppercase alphanumeric (e.g., MBBK for Mobile Banking). Must comply with ALZ naming conventions."
@@ -167,13 +169,10 @@ variable "tags" {
   description = "(Optional) Tags of the resource."
 }
 
-# Consolidated network and RBAC settings as an object input variable
-variable "network_and_rbac_settings" {
-  description = <<-EOT
-    Network and RBAC configuration for the log analytics workspace.
-    - firewall_ips: List of allowed IPv4 addresses for the log analytics workspace firewall.
-    - vnet_subnet_ids: List of allowed Azure subnet resource IDs.
-    - role_assignments: Map of RBAC role assignments (see below for structure).
+
+variable "role_assignments" {
+  description = <<EOT
+      role_assignments: Map of RBAC role assignments (see below for structure).
     Each role assignment value must specify:
       - role_definition_id_or_name: The ID or name of the role definition to assign.
       - principal_id: The object ID of the principal (user, group, or service principal).
@@ -185,42 +184,23 @@ variable "network_and_rbac_settings" {
         - condition_version
         - delegated_managed_identity_resource_id
   EOT
-  type = object({
-    firewall_ips    = optional(list(string), [])
-    vnet_subnet_ids = optional(list(string), [])
-    role_assignments = optional(map(object({
-      role_definition_id_or_name             = string
-      principal_id                           = string
-      principal_type                         = string
-      description                            = optional(string, null)
-      skip_service_principal_aad_check       = optional(bool, false)
-      condition                              = optional(string, null)
-      condition_version                      = optional(string, null)
-      delegated_managed_identity_resource_id = optional(string, null)
-    })), {})
-  })
-  nullable = false
+  type = map(object({
+    role_definition_id_or_name             = string
+    principal_id                           = string
+    principal_type                         = string
+    description                            = optional(string, null)
+    skip_service_principal_aad_check       = optional(bool, false)
+    condition                              = optional(string, null)
+    condition_version                      = optional(string, null)
+    delegated_managed_identity_resource_id = optional(string, null)
+  }))
+  default = {}
+
   validation {
     condition = (
+      length(coalesce(var.role_assignments, {})) == 0 ||
       alltrue([
-        for ip in coalesce(var.network_and_rbac_settings.firewall_ips, []) : can(regex("^([0-9]{1,3}\\.){3}[0-9]{1,3}$", ip))
-      ])
-    )
-    error_message = "Each firewall IP must be a valid IPv4 address."
-  }
-  validation {
-    condition = (
-      alltrue([
-        for id in coalesce(var.network_and_rbac_settings.vnet_subnet_ids, []) : can(regex("^/subscriptions/.+/resourceGroups/.+/providers/Microsoft.Network/virtualNetworks/.+/subnets/.+$", id))
-      ])
-    )
-    error_message = "Each subnet ID must be a valid Azure subnet resource ID."
-  }
-  validation {
-    condition = (
-      length(coalesce(var.network_and_rbac_settings.role_assignments, {})) == 0 ||
-      alltrue([
-        for ra in values(var.network_and_rbac_settings.role_assignments) : (
+        for ra in values(var.role_assignments) : (
           contains(["ServicePrincipal", "ManagedIdentity"], ra.principal_type)
         )
       ])
@@ -228,6 +208,7 @@ variable "network_and_rbac_settings" {
     error_message = "If set, all role assignments must have principal_type set to 'ServicePrincipal' or 'ManagedIdentity'."
   }
 }
+
 
 # Variables to be configured in furture releases of this module.
 # variable "monitor_private_link_scope" {

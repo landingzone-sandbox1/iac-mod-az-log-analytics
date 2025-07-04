@@ -33,7 +33,7 @@ resource "azurerm_log_analytics_workspace" "this" {
 }
 
 resource "azurerm_role_assignment" "log_analytics_workspace" {
-  for_each = var.network_and_rbac_settings.role_assignments
+  for_each = var.role_assignments
 
   principal_id                           = each.value.principal_id
   scope                                  = azurerm_log_analytics_workspace.this.id
