@@ -39,34 +39,21 @@ module "azure_rg_example_for_law" {
 
 # Example Log Analytics Workspace deployment
 module "azure_log_analytics_example" {
-  source              = "git::ssh://git@github.com/landingzone-sandbox/iac-mod-az-log-analytics.git"
+  source = "../../"
 
   # Required variables
-  location         = var.location
-  application_code = var.application_code
-  objective_code   = var.objective_code
-  environment      = var.environment
-  correlative      = var.correlative
+  location            = var.location
+  application_code    = var.application_code
+  objective_code      = var.objective_code
+  environment         = var.environment
+  correlative         = var.correlative
+  resource_group_name = module.azure_rg_example_for_law.name
 
   # Optional variables with recommended defaults
   log_analytics_workspace_allow_resource_only_permissions = false
   log_analytics_workspace_cmk_for_query_forced            = false
   log_analytics_workspace_internet_ingestion_enabled      = false
   log_analytics_workspace_internet_query_enabled          = false
-
-  # Network and RBAC settings
-  network_and_rbac_settings = {
-    firewall_ips    = []
-    vnet_subnet_ids = []
-    # Example role assignments (uncomment and modify as needed)
-    # role_assignments = {
-    #   "contributor" = {
-    #     role_definition_id_or_name = "Log Analytics Contributor"
-    #     principal_id               = data.azurerm_client_config.current.object_id
-    #     principal_type             = "ServicePrincipal"
-    #   }
-    # }
-  }
 
   # Optional configurations
   log_analytics_workspace_identity = {
