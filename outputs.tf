@@ -4,7 +4,8 @@ output "resource_id" {
 }
 
 output "log_analytics_workspace_name" {
-  value = azurerm_log_analytics_workspace.this.name
+  description = "The computed Log Analytics workspace name following ALZ naming conventions"
+  value       = azurerm_log_analytics_workspace.this.name
 }
 
 output "resource_group_name" {

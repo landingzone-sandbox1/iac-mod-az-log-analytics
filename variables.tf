@@ -54,33 +54,6 @@ DESCRIPTION
   }
 }
 
-# required AVM interfaces
-# remove only if not supported by the resource
-# tflint-ignore: terraform_unused_declarations
-variable "customer_managed_key" {
-  type = object({
-    key_vault_resource_id = string
-    key_name              = string
-    key_version           = optional(string, null)
-    user_assigned_identity = optional(object({
-      resource_id = string
-    }), null)
-  })
-  default     = null
-  description = <<DESCRIPTION
-A map describing customer-managed keys to associate with the resource. This includes the following properties:
-- `key_vault_resource_id` - The resource ID of the Key Vault where the key is stored.
-- `key_name` - The name of the key.
-- `key_version` - (Optional) The version of the key. If not specified, the latest version is used.
-- `user_assigned_identity` - (Optional) An object representing a user-assigned identity with the following properties:
-  - `resource_id` - The resource ID of the user-assigned identity.
-DESCRIPTION  
-  validation {
-    condition     = var.customer_managed_key == null || (try(var.customer_managed_key.key_vault_resource_id, null) != null && try(var.customer_managed_key.key_name, null) != null)
-    error_message = "If set, customer_managed_key must include both key_vault_resource_id and key_name."
-  }
-}
-
 variable "log_analytics_config" {
   type = object({
     # Workspace permissions and security
@@ -88,6 +61,16 @@ variable "log_analytics_config" {
     cmk_for_query_forced            = optional(bool, false)
     internet_ingestion_enabled      = optional(bool, false)
     internet_query_enabled          = optional(bool, false)
+
+    # Customer Managed Key configuration
+    customer_managed_key = optional(object({
+      key_vault_resource_id = string
+      key_name              = string
+      key_version           = optional(string, null)
+      user_assigned_identity = optional(object({
+        resource_id = string
+      }), null)
+    }), null)
 
     # Managed identity configuration
     identity = optional(object({
@@ -127,6 +110,13 @@ Security & Access:
 - `cmk_for_query_forced` - (Optional) Force Customer Managed Key for query management. Defaults to false for compatibility.
 - `internet_ingestion_enabled` - (Optional) Support ingestion over Public Internet. Defaults to false.
 - `internet_query_enabled` - (Optional) Support querying over Public Internet. Defaults to false.
+
+Customer Managed Key:
+- `customer_managed_key` - (Optional) Customer-managed encryption key configuration with the following properties:
+  - `key_vault_resource_id` - The resource ID of the Key Vault where the key is stored
+  - `key_name` - The name of the key
+  - `key_version` - (Optional) The version of the key. If not specified, the latest version is used
+  - `user_assigned_identity` - (Optional) User-assigned identity with resource_id property
 
 Identity & RBAC:
 - `identity` - (Optional) Managed identity configuration with type and identity_ids
@@ -180,6 +170,16 @@ DESCRIPTION
       ])
     )
     error_message = "Tag keys must be alphanumeric, dash, or underscore. Tag values can include alphanumeric characters, spaces, dashes, underscores, periods, and commas."
+  }
+
+  # Validate customer_managed_key configuration
+  validation {
+    condition = (
+      var.log_analytics_config.customer_managed_key == null ||
+      (try(var.log_analytics_config.customer_managed_key.key_vault_resource_id, null) != null &&
+      try(var.log_analytics_config.customer_managed_key.key_name, null) != null)
+    )
+    error_message = "If customer_managed_key is set, both key_vault_resource_id and key_name must be provided."
   }
 
   # Validate role assignment principal types
