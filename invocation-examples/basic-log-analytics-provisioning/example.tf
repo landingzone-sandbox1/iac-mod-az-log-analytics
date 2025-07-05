@@ -20,21 +20,37 @@ terraform {
 
 provider "azurerm" {
   features {}
+  subscription_id = "0bd8fd8a-69f4-4d31-b498-fd04e55a6567" # Current subscription
 }
 
 # Azure context data source
 data "azurerm_client_config" "current" {}
 
-# Resource Group module
-module "azure_rg_example_for_law" {
-  source           = "git::ssh://git@github.com/landingzone-sandbox/iac-mod-az-resource-group.git"
-  location         = var.location
-  application_code = var.application_code
-  region_code      = var.region_code
-  correlative      = var.correlative
-  environment      = var.environment
-  tags             = var.tags
-  name             = local.resource_group_name
+# Create the resource group first
+resource "azurerm_resource_group" "example" {
+  name     = upper("RSG${lookup(local.location_to_region_code, var.location, "EUS2")}${var.application_code}${var.objective_code}${var.environment}${var.correlative}")
+  location = var.location
+  tags     = var.tags
+}
+
+# Local values for region mapping (same as in module)
+locals {
+  location_to_region_code = {
+    "East US"          = "EUS"
+    "East US 2"        = "EUS2"
+    "Central US"       = "CUS"
+    "North Central US" = "NCUS"
+    "South Central US" = "SCUS"
+    "West US"          = "WUS"
+    "West US 2"        = "WUS2"
+    "West US 3"        = "WUS3"
+    "Canada Central"   = "CCAN"
+    "Canada East"      = "ECAN"
+    "Brazil South"     = "BSOU"
+    "Brazil Southeast" = "BSE"
+    "Mexico Central"   = "MCEN"
+    "Chile Central"    = "CCEN"
+  }
 }
 
 # Example Log Analytics Workspace deployment
@@ -42,43 +58,49 @@ module "azure_log_analytics_example" {
   source = "../../"
 
   # Required variables
-  location            = var.location
-  application_code    = var.application_code
-  objective_code      = var.objective_code
-  environment         = var.environment
-  correlative         = var.correlative
-  resource_group_name = module.azure_rg_example_for_law.name
+  location = var.location
 
-  # Optional variables with recommended defaults
-  log_analytics_workspace_allow_resource_only_permissions = false
-  log_analytics_workspace_cmk_for_query_forced            = false
-  log_analytics_workspace_internet_ingestion_enabled      = false
-  log_analytics_workspace_internet_query_enabled          = false
-
-  # Optional configurations
-  log_analytics_workspace_identity = {
-    type = "SystemAssigned"
+  # Naming configuration
+  naming = {
+    application_code = var.application_code
+    objective_code   = var.objective_code
+    environment      = var.environment
+    correlative      = var.correlative
   }
 
-  # Optional timeouts
-  log_analytics_workspace_timeouts = {
-    create = "30m"
-    delete = "30m"
-    read   = "5m"
-    update = "30m"
-  }
+  # Log Analytics configuration
+  log_analytics_config = {
+    # Security settings (secure defaults)
+    allow_resource_only_permissions = false
+    cmk_for_query_forced            = false
+    internet_ingestion_enabled      = false
+    internet_query_enabled          = false
 
-  # Tags
-  tags = var.tags
+    # Managed identity configuration
+    identity = {
+      type = "SystemAssigned"
+    }
 
-  # Role assignments (optional)
-  role_assignments = {
-    # Example role assignment for the current user/service principal
-    "current_user_contributor" = {
-      role_definition_id_or_name = "Log Analytics Contributor"
-      principal_id               = data.azurerm_client_config.current.object_id
-      principal_type             = "ServicePrincipal"
-      description                = "Contributor access for current user"
+    # Operational settings
+    timeouts = {
+      create = "30m"
+      delete = "30m"
+      read   = "5m"
+      update = "30m"
+    }
+
+    # Resource tags
+    tags = var.tags
+
+    # RBAC role assignments with least-privilege enforcement
+    role_assignments = {
+      # Example: Grant Log Analytics Reader access to a service principal
+      "monitoring_reader" = {
+        role_definition_id_or_name = "Log Analytics Reader"
+        principal_id               = data.azurerm_client_config.current.object_id
+        principal_type             = "ServicePrincipal"
+        description                = "Read-only access for monitoring"
+      }
     }
   }
 }
@@ -87,7 +109,7 @@ module "azure_log_analytics_example" {
 variable "location" {
   description = "Azure region for the workspace."
   type        = string
-  default     = "eastus2"
+  default     = "East US 2" # Must match a region in local.location_to_region_code
 }
 
 variable "application_code" {
@@ -125,6 +147,11 @@ variable "tags" {
 }
 
 # Outputs
+output "resource_group_name" {
+  description = "Name of the created resource group."
+  value       = azurerm_resource_group.example.name
+}
+
 output "log_analytics_workspace_id" {
   description = "Resource ID of the Log Analytics Workspace."
   value       = module.azure_log_analytics_example.resource_id
