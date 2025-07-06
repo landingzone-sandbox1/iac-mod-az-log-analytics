@@ -55,16 +55,22 @@ locals {
   }
 
 
-  service_code                 = "LAW"
-  service_code_rsg             = "RSG"
-  application_code             = var.naming.application_code
-  objective_code               = var.naming.objective_code
-  environment                  = var.naming.environment
-  correlative                  = var.naming.correlative
-  region_code                  = lookup(local.location_to_region_code, var.location, "EU2")
+  service_code     = "LAW"
+  service_code_rsg = "RSG"
+  application_code = var.naming.application_code
+  objective_code   = var.naming.objective_code
+  environment      = var.naming.environment
+  correlative      = var.naming.correlative
+  region_code      = lookup(local.location_to_region_code, var.location, "EU2")
+
+  # Always construct both names for ALZ compliance
   log_analytics_workspace_name = lower("${local.service_code}${local.region_code}${local.application_code}${local.objective_code}${local.environment}${local.correlative}")
-  # Use provided resource group name or generate ALZ-compliant one
-  resource_group_name                                   = var.resource_group_name != null ? var.resource_group_name : upper("${local.service_code_rsg}${local.region_code}${local.application_code}${local.objective_code}${local.environment}${local.correlative}")
+  # RG naming: RSG + Region(3) + App(4) + Env(1) + Correlative(2) - NO objective code
+  resource_group_name_generated = upper("${local.service_code_rsg}${local.region_code}${local.application_code}${local.environment}${local.correlative}")
+
+  # LAW module uses provided RG name (assumes RG already exists)
+  resource_group_name = var.resource_group_name
+
   log_analytics_workspace_sku                           = "PerGB2018"
   log_analytics_workspace_daily_quota_gb                = -1
   log_analytics_workspace_retention_in_days             = local.objective_code == "SEGU" ? 365 : 90

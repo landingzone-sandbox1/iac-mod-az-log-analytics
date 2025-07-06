@@ -1,7 +1,7 @@
 # =============================================================================
-# Example 1: Using Auto-Generated ALZ Resource Group Name
+# Example: Standalone LAW with ALZ-Compliant Manual RG Creation
 # =============================================================================
-# This example shows how to let the module generate the RG name automatically
+# This shows how to create an ALZ-compliant RG and deploy LAW into it
 
 terraform {
   required_version = "~> 1.9"
@@ -17,32 +17,39 @@ provider "azurerm" {
   features {}
 }
 
-# Step 1: Get the ALZ-compliant RG name that the module would generate
-locals {
-  # Manual calculation of ALZ RG name (should match module's logic)
-  region_code_map = {
-    "East US 2" = "EU2"
+# First, get the expected ALZ RG name from LAW module
+module "law_naming_check" {
+  source = "../../"
+
+  location            = "East US 2"
+  resource_group_name = "RSGEU2MBBKD01"  # ALZ-compliant RG name: RSG + EU2 + MBBK + D + 01
+
+  naming = {
+    application_code = "MBBK"
+    objective_code   = "SEGU"
+    environment      = "D"
+    correlative      = "01"
   }
-  region_code = local.region_code_map["East US 2"]
-  alz_rg_name = upper("RSG${local.region_code}MBBKSEGUD01")
+
+  log_analytics_config = {}
 }
 
-# Step 2: Create the resource group with ALZ-compliant name
-resource "azurerm_resource_group" "auto_named" {
-  name     = local.alz_rg_name
+# Create ALZ-compliant resource group manually
+resource "azurerm_resource_group" "alz_compliant" {
+  name     = module.law_naming_check.resource_group_name_expected
   location = "East US 2"
   tags = {
     Environment = "Development"
-    ManagedBy   = "Terraform"
+    Purpose     = "ALZ-compliant standalone RG for LAW"
   }
 }
 
-# Step 3: Log Analytics Workspace using auto-generated RG name logic
-module "law_auto" {
+# Deploy LAW into the created RG
+module "law_standalone" {
   source = "../../"
 
-  location = "East US 2"
-  # Don't specify resource_group_name - let it auto-generate (should match local.alz_rg_name)
+  location            = "East US 2"
+  resource_group_name = azurerm_resource_group.alz_compliant.name
 
   naming = {
     application_code = "MBBK"
@@ -54,32 +61,20 @@ module "law_auto" {
   log_analytics_config = {
     tags = {
       Environment = "Development"
-      Purpose     = "Auto-named example"
+      Purpose     = "Standalone LAW with manual ALZ RG"
     }
   }
 
-  depends_on = [azurerm_resource_group.auto_named]
+  depends_on = [azurerm_resource_group.alz_compliant]
 }
 
-# Validation: Ensure the module generates the same RG name we created
-output "validation_rg_names_match" {
-  description = "Validates that our manual RG name calculation matches the module's"
+# Validation outputs - show the ALZ coordination
+output "alz_coordination_info" {
+  description = "Shows ALZ-compliant naming coordination"
   value = {
-    manual_rg_name    = local.alz_rg_name
-    module_rg_name    = module.law_auto.resource_group_name
-    names_match       = local.alz_rg_name == module.law_auto.resource_group_name
+    expected_rg_name = module.law_naming_check.resource_group_name_expected
+    actual_rg_name   = azurerm_resource_group.alz_compliant.name
+    law_name         = module.law_standalone.log_analytics_workspace_name
+    names_match      = module.law_naming_check.resource_group_name_expected == azurerm_resource_group.alz_compliant.name
   }
-}
-
-output "law_resource_id" {
-  description = "The created Log Analytics Workspace resource ID"
-  value       = module.law_auto.resource_id
-}
-
-output "auto_rg_name" {
-  value = module.law_auto.resource_group_name
-}
-
-output "auto_workspace_name" {
-  value = module.law_auto.log_analytics_workspace_name
 }

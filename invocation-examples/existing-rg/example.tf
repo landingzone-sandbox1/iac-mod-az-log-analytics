@@ -17,9 +17,9 @@ provider "azurerm" {
   features {}
 }
 
-# Existing resource group (could be created elsewhere or already exist)
+# Existing resource group with ALZ-compliant naming
 resource "azurerm_resource_group" "existing" {
-  name     = "rg-shared-monitoring-prod"  # User's own naming convention
+  name     = "RSGEU2MBBKP01"  # ALZ-compliant: RSG + EU2 + MBBK + P + 01 (13 chars total)
   location = "East US 2"
   tags = {
     Environment = "Production"
@@ -32,8 +32,10 @@ resource "azurerm_resource_group" "existing" {
 module "law_existing_rg" {
   source = "../../"
 
-  location            = "East US 2"
-  resource_group_name = azurerm_resource_group.existing.name  # Use existing RG
+  location = "East US 2"
+  
+  # Use existing resource group name (LAW module assumes RG exists)
+  resource_group_name = azurerm_resource_group.existing.name
 
   naming = {
     application_code = "MBBK"
@@ -54,8 +56,10 @@ module "law_existing_rg" {
 module "law_additional" {
   source = "../../"
 
-  location            = "East US 2"
-  resource_group_name = azurerm_resource_group.existing.name  # Same RG
+  location = "East US 2"
+  
+  # Use same existing resource group name (LAW module assumes RG exists)
+  resource_group_name = azurerm_resource_group.existing.name
 
   naming = {
     application_code = "MBBK"
@@ -81,18 +85,19 @@ locals {
   }
   region_code = local.region_code_map["East US 2"]
   
-  # What ALZ-compliant names would be for these workspaces
-  alz_rg_name_1 = upper("RSG${local.region_code}MBBKSEGUP02")
-  alz_rg_name_2 = upper("RSG${local.region_code}MBBKAUDTP01")
+  # What ALZ-compliant RG names would be for these workspaces (RG pattern: no objective code)
+  alz_rg_name_1 = upper("RSGEU2MBBKP02")  # RSG + EU2 + MBBK + P + 02
+  alz_rg_name_2 = upper("RSGEU2MBBKP01")  # RSG + EU2 + MBBK + P + 01
 }
 
 output "validation_info" {
-  description = "Shows the difference between ALZ naming and custom naming"
+  description = "Shows ALZ-compliant naming in use"
   value = {
-    actual_rg_name          = azurerm_resource_group.existing.name
-    alz_compliant_rg_name_1 = local.alz_rg_name_1
-    alz_compliant_rg_name_2 = local.alz_rg_name_2
-    using_custom_naming     = true
+    actual_rg_name           = azurerm_resource_group.existing.name
+    expected_rg_pattern      = "RSGEU2MBBKP01"  # RG naming: RSG + region(3) + app(4) + env(1) + correlative(2)
+    rg_name_is_alz_compliant = azurerm_resource_group.existing.name == "RSGEU2MBBKP01"
+    law1_alz_name           = module.law_existing_rg.log_analytics_workspace_name
+    law2_alz_name           = module.law_additional.log_analytics_workspace_name
   }
 }
 

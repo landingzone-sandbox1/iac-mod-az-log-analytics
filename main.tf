@@ -1,3 +1,4 @@
+# LAW module only creates Log Analytics Workspace - never creates Resource Groups
 resource "azurerm_log_analytics_workspace" "this" {
   location                        = var.location
   name                            = local.log_analytics_workspace_name

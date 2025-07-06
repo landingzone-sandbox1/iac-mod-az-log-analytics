@@ -26,30 +26,31 @@ provider "azurerm" {
 # Azure context data source
 data "azurerm_client_config" "current" {}
 
-# Create the resource group first
+# Create the resource group first (following ALZ RG naming convention)
 resource "azurerm_resource_group" "example" {
-  name     = upper("RSG${lookup(local.location_to_region_code, var.location, "EUS2")}${var.application_code}${var.objective_code}${var.environment}${var.correlative}")
+  name     = upper("RSG${lookup(local.location_to_region_code, var.location, "EU2")}${var.application_code}${var.environment}${var.correlative}")
   location = var.location
   tags     = var.tags
 }
 
-# Local values for region mapping (same as in module)
+# Local values for region mapping (matching main module)
 locals {
   location_to_region_code = {
-    "East US"          = "EUS"
-    "East US 2"        = "EUS2"
-    "Central US"       = "CUS"
-    "North Central US" = "NCUS"
-    "South Central US" = "SCUS"
-    "West US"          = "WUS"
-    "West US 2"        = "WUS2"
-    "West US 3"        = "WUS3"
-    "Canada Central"   = "CCAN"
-    "Canada East"      = "ECAN"
-    "Brazil South"     = "BSOU"
-    "Brazil Southeast" = "BSE"
-    "Mexico Central"   = "MCEN"
-    "Chile Central"    = "CCEN"
+    # USA - Long forms (display names)
+    "East US"              = "EU1"
+    "East US 2"            = "EU2" 
+    "Central US"           = "CU1"
+    "North Central US"     = "NCU"
+    "South Central US"     = "SCU"
+    "West US"              = "WU1"
+    "West US 2"            = "WU2"
+    "West US 3"            = "WU3"
+    "Canada Central"       = "CC1"
+    "Canada East"          = "CE1"
+    "Brazil South"         = "BS1"
+    "Brazil Southeast"     = "BSE"
+    "Mexico Central"       = "MC1"
+    "Chile Central"        = "CL1"
   }
 }
 
@@ -58,7 +59,8 @@ module "azure_log_analytics_example" {
   source = "../../"
 
   # Required variables
-  location = var.location
+  location            = var.location
+  resource_group_name = azurerm_resource_group.example.name
 
   # Naming configuration
   naming = {
