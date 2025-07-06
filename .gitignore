@@ -73,3 +73,9 @@ TestRecord/
 ./basic-log-analytics-provisioning/example.auto.tfvars
 
 **/usage-markdown/**
+
+/module-template/
+ALZ_NAMING_COMPLIANCE.md
+CACHE_CLEARING_GUIDE.md
+REFACTORING_SUMMARY.md
+VARIABLE_RESTRUCTURE_SUMMARY.md

@@ -18,6 +18,18 @@ variable "location" {
   }
 }
 
+variable "resource_group_name" {
+  type        = string
+  description = "Optional. The name of the resource group where the Log Analytics Workspace will be deployed. If not provided, an ALZ-compliant name will be generated automatically."
+  default     = null
+  nullable    = true
+
+  validation {
+    condition     = var.resource_group_name == null || try(length(trim(var.resource_group_name, " ")) > 0, false)
+    error_message = "If provided, resource_group_name must not be empty."
+  }
+}
+
 variable "naming" {
   type = object({
     application_code = string

@@ -9,6 +9,11 @@ output "log_analytics_workspace_name" {
 }
 
 output "resource_group_name" {
-  description = "The computed resource group name following ALZ naming conventions"
+  description = "The resource group name used for the Log Analytics Workspace (provided or auto-generated)"
   value       = local.resource_group_name
+}
+
+output "resource_group_name_generated" {
+  description = "The ALZ-compliant resource group name that would be auto-generated"
+  value       = upper("${local.service_code_rsg}${local.region_code}${local.application_code}${local.objective_code}${local.environment}${local.correlative}")
 }
