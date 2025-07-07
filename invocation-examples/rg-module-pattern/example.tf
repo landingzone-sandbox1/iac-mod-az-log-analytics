@@ -21,8 +21,7 @@ provider "azurerm" {
 module "law_for_coordination" {
   source = "../../"
 
-  location            = "East US 2"
-  resource_group_name = "RSGEU2MBBKD01" # Correct ALZ RG name: RSG + EU2 + MBBK + D + 01
+  location = "East US 2"
 
   naming = {
     application_code = "MBBK"
@@ -31,7 +30,9 @@ module "law_for_coordination" {
     correlative      = "01"
   }
 
-  log_analytics_config = {}
+  log_analytics_config = {
+    resource_group_name = "RSGEU2MBBKD01" # Correct ALZ RG name: RSG + EU2 + MBBK + D + 01
+  }
 }
 
 # Step 2: RG Module creates RG with the ALZ name expected by LAW
@@ -49,8 +50,7 @@ resource "azurerm_resource_group" "alz_compliant" {
 module "law_actual" {
   source = "../../"
 
-  location            = "East US 2"
-  resource_group_name = azurerm_resource_group.alz_compliant.name
+  location = "East US 2"
 
   naming = {
     application_code = "MBBK"
@@ -60,6 +60,8 @@ module "law_actual" {
   }
 
   log_analytics_config = {
+    resource_group_name = azurerm_resource_group.alz_compliant.name
+    
     tags = {
       Environment = "Development"
       Purpose     = "RG Module Pattern"

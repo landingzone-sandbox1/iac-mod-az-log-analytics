@@ -72,6 +72,8 @@ module "azure_log_analytics_example" {
 
   # Log Analytics configuration
   log_analytics_config = {
+    # Resource Group configuration  
+    resource_group_name = azurerm_resource_group.example.name
     # Security settings (secure defaults)
     allow_resource_only_permissions = false
     cmk_for_query_forced            = false

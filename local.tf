@@ -69,7 +69,7 @@ locals {
   resource_group_name_generated = upper("${local.service_code_rsg}${local.region_code}${local.application_code}${local.environment}${local.correlative}")
 
   # LAW module uses provided RG name (assumes RG already exists)
-  resource_group_name = var.resource_group_name
+  resource_group_name = var.log_analytics_config.resource_group_name
 
   log_analytics_workspace_sku                           = "PerGB2018"
   log_analytics_workspace_daily_quota_gb                = -1

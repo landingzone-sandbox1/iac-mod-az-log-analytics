@@ -18,33 +18,6 @@ variable "location" {
   }
 }
 
-variable "resource_group_name" {
-  type        = string
-  description = "Required. The name of the ALZ-compliant resource group where the Log Analytics Workspace will be deployed."
-  nullable    = false
-
-  validation {
-    condition     = length(trim(var.resource_group_name, " ")) > 0
-    error_message = "resource_group_name must not be empty."
-  }
-
-  # Validate Azure resource group naming rules
-  validation {
-    condition = try(
-      can(regex("^[a-zA-Z0-9._()-]{1,90}$", var.resource_group_name)) &&
-      !can(regex("\\.$", var.resource_group_name)),
-      false
-    )
-    error_message = "resource_group_name must follow Azure naming rules: 1-90 characters, alphanumeric plus ._()-, and cannot end with a period."
-  }
-
-  # Enforce strict ALZ naming compliance for Resource Groups
-  validation {
-    condition     = can(regex("^RSG[A-Z0-9]{3}[A-Z0-9]{4}[DPCF][0-9]{2}$", var.resource_group_name))
-    error_message = "resource_group_name must follow ALZ RG naming convention: RSG{region_3char}{app_code_4char}{env_1char}{correlative_2digit} (e.g., RSGEU2MBBKD01). Total length: 13 characters."
-  }
-}
-
 variable "naming" {
   type = object({
     application_code = string
@@ -83,6 +56,9 @@ DESCRIPTION
 
 variable "log_analytics_config" {
   type = object({
+    # Resource Group configuration
+    resource_group_name = string
+
     # Workspace permissions and security
     allow_resource_only_permissions = optional(bool, false)
     cmk_for_query_forced            = optional(bool, false)
@@ -128,9 +104,11 @@ variable "log_analytics_config" {
       delegated_managed_identity_resource_id = optional(string, null)
     })), {})
   })
-  default     = {}
   description = <<DESCRIPTION
 Log Analytics Workspace configuration object containing all workspace settings:
+
+Resource Group:
+- `resource_group_name` - (Required) The name of the ALZ-compliant resource group where the Log Analytics Workspace will be deployed.
 
 Security & Access:
 - `allow_resource_only_permissions` - (Optional) Allow users to access data for resources they have permission to view. Defaults to false for security.
@@ -155,6 +133,28 @@ Operations:
 
 See individual validation rules for detailed requirements.
 DESCRIPTION
+
+  # Validate resource_group_name is not empty
+  validation {
+    condition     = length(trim(var.log_analytics_config.resource_group_name, " ")) > 0
+    error_message = "resource_group_name must not be empty."
+  }
+
+  # Validate Azure resource group naming rules
+  validation {
+    condition = try(
+      can(regex("^[a-zA-Z0-9._()-]{1,90}$", var.log_analytics_config.resource_group_name)) &&
+      !can(regex("\\.$", var.log_analytics_config.resource_group_name)),
+      false
+    )
+    error_message = "resource_group_name must follow Azure naming rules: 1-90 characters, alphanumeric plus ._()-, and cannot end with a period."
+  }
+
+  # Enforce strict ALZ naming compliance for Resource Groups
+  validation {
+    condition     = can(regex("^RSG[A-Z0-9]{3}[A-Z0-9]{4}[DPCF][0-9]{2}$", var.log_analytics_config.resource_group_name))
+    error_message = "resource_group_name must follow ALZ RG naming convention: RSG{region_3char}{app_code_4char}{env_1char}{correlative_2digit} (e.g., RSGEU2MBBKD01). Total length: 13 characters."
+  }
 
   # Validate identity configuration
   validation {

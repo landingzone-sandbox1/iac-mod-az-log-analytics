@@ -76,9 +76,9 @@ This directory contains three complete examples demonstrating different usage pa
 
 ### Required Inputs
 - `location` (string): Azure region (must be supported)
-- `resource_group_name` (string): ALZ-compliant RG name (**must exist**)
 - `naming` (object): LAW naming parameters
-- `log_analytics_config` (object): LAW configuration
+- `log_analytics_config` (object): LAW configuration including:
+  - `resource_group_name` (string): ALZ-compliant RG name (**must exist**)
 
 ### ALZ Naming Conventions
 
@@ -121,10 +121,10 @@ Example: laweu2mbbksegud01 (lowercase)
 
 3. **Key variables to customize:**
    - `location`: Your Azure region
-   - `resource_group_name`: Your ALZ-compliant RG name
    - `naming.application_code`: Your 4-char app code
    - `naming.objective_code`: Your LAW purpose (e.g., "SEGU", "MONI")
    - `naming.environment`: D/P/C/F
+   - `log_analytics_config.resource_group_name`: Your ALZ-compliant RG name
    - `log_analytics_config.tags`: Your tags
 
 ---

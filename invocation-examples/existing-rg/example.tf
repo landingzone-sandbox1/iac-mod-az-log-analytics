@@ -18,6 +18,7 @@ provider "azurerm" {
 }
 
 # Existing resource group with ALZ-compliant naming
+# Existing resource group with ALZ-compliant naming
 resource "azurerm_resource_group" "existing" {
   name     = "RSGEU2MBBKP01"  # ALZ-compliant: RSG + EU2 + MBBK + P + 01 (13 chars total)
   location = "East US 2"
@@ -34,9 +35,6 @@ module "law_existing_rg" {
 
   location = "East US 2"
   
-  # Use existing resource group name (LAW module assumes RG exists)
-  resource_group_name = azurerm_resource_group.existing.name
-
   naming = {
     application_code = "MBBK"
     objective_code   = "SEGU"
@@ -45,6 +43,9 @@ module "law_existing_rg" {
   }
 
   log_analytics_config = {
+    # Use existing resource group name (LAW module assumes RG exists)
+    resource_group_name = azurerm_resource_group.existing.name
+    
     tags = {
       Environment = "Production"
       Purpose     = "Existing RG example"
@@ -58,9 +59,6 @@ module "law_additional" {
 
   location = "East US 2"
   
-  # Use same existing resource group name (LAW module assumes RG exists)
-  resource_group_name = azurerm_resource_group.existing.name
-
   naming = {
     application_code = "MBBK"
     objective_code   = "AUDT"  # Different objective = different workspace
@@ -69,6 +67,9 @@ module "law_additional" {
   }
 
   log_analytics_config = {
+    # Use same existing resource group name (LAW module assumes RG exists)
+    resource_group_name = azurerm_resource_group.existing.name
+    
     tags = {
       Environment = "Production"
       Purpose     = "Additional LAW in same RG"
