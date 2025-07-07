@@ -57,7 +57,7 @@ DESCRIPTION
 variable "log_analytics_config" {
   type = object({
     # Resource Group configuration
-    resource_group_name = string
+    resource_group_name = optional(string, null)
 
     # Workspace permissions and security
     allow_resource_only_permissions = optional(bool, false)
