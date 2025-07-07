@@ -108,7 +108,7 @@ variable "log_analytics_config" {
 Log Analytics Workspace configuration object containing all workspace settings:
 
 Resource Group:
-- `resource_group_name` - (Required) The name of the ALZ-compliant resource group where the Log Analytics Workspace will be deployed.
+- `resource_group_name` - (Optional) The name of the ALZ-compliant resource group where the Log Analytics Workspace will be deployed. If not provided, an ALZ-compliant name will be auto-generated from the naming parameters.
 
 Security & Access:
 - `allow_resource_only_permissions` - (Optional) Allow users to access data for resources they have permission to view. Defaults to false for security.
@@ -134,26 +134,35 @@ Operations:
 See individual validation rules for detailed requirements.
 DESCRIPTION
 
-  # Validate resource_group_name is not empty
+  # Validate resource_group_name if provided (when null, computed ALZ name will be used)
   validation {
-    condition     = length(trim(var.log_analytics_config.resource_group_name, " ")) > 0
-    error_message = "resource_group_name must not be empty."
-  }
-
-  # Validate Azure resource group naming rules
-  validation {
-    condition = try(
-      can(regex("^[a-zA-Z0-9._()-]{1,90}$", var.log_analytics_config.resource_group_name)) &&
-      !can(regex("\\.$", var.log_analytics_config.resource_group_name)),
-      false
+    condition = (
+      var.log_analytics_config.resource_group_name == null ||
+      try(length(trim(var.log_analytics_config.resource_group_name, " ")) > 0, false)
     )
-    error_message = "resource_group_name must follow Azure naming rules: 1-90 characters, alphanumeric plus ._()-, and cannot end with a period."
+    error_message = "resource_group_name, if provided, must not be empty."
   }
 
-  # Enforce strict ALZ naming compliance for Resource Groups
+  # Validate Azure resource group naming rules if provided
   validation {
-    condition     = can(regex("^RSG[A-Z0-9]{3}[A-Z0-9]{4}[DPCF][0-9]{2}$", var.log_analytics_config.resource_group_name))
-    error_message = "resource_group_name must follow ALZ RG naming convention: RSG{region_3char}{app_code_4char}{env_1char}{correlative_2digit} (e.g., RSGEU2MBBKD01). Total length: 13 characters."
+    condition = (
+      var.log_analytics_config.resource_group_name == null ||
+      try(
+        can(regex("^[a-zA-Z0-9._()-]{1,90}$", var.log_analytics_config.resource_group_name)) &&
+        !can(regex("\\.$", var.log_analytics_config.resource_group_name)),
+        false
+      )
+    )
+    error_message = "resource_group_name, if provided, must follow Azure naming rules: 1-90 characters, alphanumeric plus ._()-, and cannot end with a period."
+  }
+
+  # Enforce strict ALZ naming compliance for Resource Groups if provided
+  validation {
+    condition = (
+      var.log_analytics_config.resource_group_name == null ||
+      can(regex("^RSG[A-Z0-9]{3}[A-Z0-9]{4}[DPCF][0-9]{2}$", var.log_analytics_config.resource_group_name))
+    )
+    error_message = "resource_group_name, if provided, must follow ALZ RG naming convention: RSG{region_3char}{app_code_4char}{env_1char}{correlative_2digit} (e.g., RSGEU2MBBKD01). Total length: 13 characters."
   }
 
   # Validate identity configuration

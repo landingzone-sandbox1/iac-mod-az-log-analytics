@@ -68,8 +68,11 @@ locals {
   # RG naming: RSG + Region(3) + App(4) + Env(1) + Correlative(2) - NO objective code
   resource_group_name_generated = upper("${local.service_code_rsg}${local.region_code}${local.application_code}${local.environment}${local.correlative}")
 
-  # LAW module uses provided RG name (assumes RG already exists)
-  resource_group_name = var.log_analytics_config.resource_group_name
+  # Smart merge: Use provided RG name if given, otherwise use computed ALZ-compliant name
+  resource_group_name = coalesce(
+    var.log_analytics_config.resource_group_name,
+    local.resource_group_name_generated
+  )
 
   log_analytics_workspace_sku                           = "PerGB2018"
   log_analytics_workspace_daily_quota_gb                = -1

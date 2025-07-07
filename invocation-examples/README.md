@@ -26,7 +26,29 @@ This directory contains three complete examples demonstrating different usage pa
 
 ---
 
-### 2. 🏗️ **rg-module-pattern**
+### 2. � **auto-generated-rg-name**
+**Use Case:** Auto-generate ALZ-compliant Resource Group names
+
+**When to Use:**
+- You want the module to auto-generate ALZ-compliant RG names
+- You prefer consistent naming without manual specification
+- You're using the module in automation scenarios
+
+**What it Does:**
+- Uses `resource_group_name = null` to trigger auto-generation
+- Generates ALZ-compliant RG name from naming parameters
+- Shows both provided and computed names in outputs
+- Demonstrates the merge logic between provided and computed names
+
+**Key Features:**
+- ✅ Automatic ALZ name generation
+- ✅ Smart merge: provided name overrides computed name
+- ✅ Clear outputs showing name resolution
+- ✅ Perfect for automation and consistency
+
+---
+
+### 3. �🏗️ **rg-module-pattern**
 **Use Case:** Coordination between RG module and LAW module
 
 **When to Use:**
@@ -48,7 +70,7 @@ This directory contains three complete examples demonstrating different usage pa
 
 ---
 
-### 3. 🔄 **existing-rg**
+### 4. 🔄 **existing-rg**
 **Use Case:** Adding LAW to pre-existing Resource Groups
 
 **When to Use:**
@@ -78,7 +100,7 @@ This directory contains three complete examples demonstrating different usage pa
 - `location` (string): Azure region (must be supported)
 - `naming` (object): LAW naming parameters
 - `log_analytics_config` (object): LAW configuration including:
-  - `resource_group_name` (string): ALZ-compliant RG name (**must exist**)
+  - `resource_group_name` (optional string): ALZ-compliant RG name. If null/not provided, an ALZ-compliant name will be auto-generated from naming parameters.
 
 ### ALZ Naming Conventions
 
