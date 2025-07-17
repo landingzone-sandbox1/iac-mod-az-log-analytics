@@ -8,7 +8,7 @@ resource "azurerm_log_analytics_workspace" "this" {
   daily_quota_gb                  = local.log_analytics_workspace_daily_quota_gb
   internet_ingestion_enabled      = var.log_analytics_config.internet_ingestion_enabled
   internet_query_enabled          = var.log_analytics_config.internet_query_enabled
-  local_authentication_disabled   = local.log_analytics_workspace_local_authentication_disabled
+  local_authentication_enabled    = local.log_analytics_workspace_local_authentication_enabled
   retention_in_days               = local.log_analytics_workspace_retention_in_days
   sku                             = local.log_analytics_workspace_sku
   tags                            = var.log_analytics_config.tags
@@ -44,5 +44,20 @@ resource "azurerm_role_assignment" "log_analytics_workspace" {
   role_definition_id                     = strcontains(lower(each.value.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? each.value.role_definition_id_or_name : null
   role_definition_name                   = strcontains(lower(each.value.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? null : each.value.role_definition_id_or_name
   skip_service_principal_aad_check       = each.value.skip_service_principal_aad_check
+
+}
+
+data "azurerm_subscription" "current" {}
+
+resource "azurerm_monitor_diagnostic_setting" "activity_logs" {
+  count                          = var.naming.environment == "F" ? 1 : 0
+  name                           = "send-activity-logs"
+  target_resource_id             = data.azurerm_subscription.current.id
+  log_analytics_workspace_id     = azurerm_log_analytics_workspace.this.id
+  log_analytics_destination_type = "Dedicated"
+
+  enabled_log {
+    category = "Security"
+  }
 
 }

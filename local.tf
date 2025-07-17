@@ -58,7 +58,7 @@ locals {
   service_code     = "LAW"
   service_code_rsg = "RSG"
   application_code = var.naming.application_code
-  objective_code   = var.naming.objective_code
+  objective_code   = var.naming.environment == "F" ? "SEGU" : var.naming.objective_code
   environment      = var.naming.environment
   correlative      = var.naming.correlative
   region_code      = lookup(local.location_to_region_code, var.location, "EU2")
@@ -74,10 +74,10 @@ locals {
     local.resource_group_name_generated
   )
 
-  log_analytics_workspace_sku                           = "PerGB2018"
-  log_analytics_workspace_daily_quota_gb                = -1
-  log_analytics_workspace_retention_in_days             = local.objective_code == "SEGU" ? 365 : 90
-  log_analytics_workspace_local_authentication_disabled = true
+  log_analytics_workspace_sku                          = "PerGB2018"
+  log_analytics_workspace_daily_quota_gb               = -1
+  log_analytics_workspace_retention_in_days            = local.objective_code == "SEGU" ? 365 : 90
+  log_analytics_workspace_local_authentication_enabled = true
 
   # --- RBAC/Role Definitions ---
   role_definition_resource_substring = "/providers/microsoft.authorization/roledefinitions/"
