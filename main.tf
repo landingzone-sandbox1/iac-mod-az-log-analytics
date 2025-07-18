@@ -8,7 +8,7 @@ resource "azurerm_log_analytics_workspace" "this" {
   daily_quota_gb                  = local.log_analytics_workspace_daily_quota_gb
   internet_ingestion_enabled      = var.log_analytics_config.internet_ingestion_enabled
   internet_query_enabled          = var.log_analytics_config.internet_query_enabled
-  local_authentication_enabled    = local.local_authentication_enabled
+  local_authentication_disabled   = local.local_authentication_disabled
   retention_in_days               = local.log_analytics_workspace_retention_in_days
   sku                             = local.log_analytics_workspace_sku
   tags                            = var.log_analytics_config.tags

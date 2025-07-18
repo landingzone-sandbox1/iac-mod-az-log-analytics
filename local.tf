@@ -77,7 +77,7 @@ locals {
   log_analytics_workspace_sku               = "PerGB2018"
   log_analytics_workspace_daily_quota_gb    = -1
   log_analytics_workspace_retention_in_days = local.objective_code == "SEGU" ? 365 : 90
-  local_authentication_enabled              = false
+  local_authentication_disabled             = true
 
   # --- RBAC/Role Definitions ---
   role_definition_resource_substring = "/providers/microsoft.authorization/roledefinitions/"
