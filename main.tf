@@ -60,4 +60,8 @@ resource "azurerm_monitor_diagnostic_setting" "activity_logs" {
     category = "Security"
   }
 
+  enabled_log {
+    category = "Administrative"
+  }
+
 }
