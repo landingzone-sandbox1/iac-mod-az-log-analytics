@@ -22,7 +22,7 @@ module "law_naming_check" {
   source = "../../"
 
   location            = "East US 2"
-  resource_group_name = "RSGEU2MBBKD01"  # ALZ-compliant RG name: RSG + EU2 + MBBK + D + 01
+  resource_group_name = "RSGEU2MBBKD01" # ALZ-compliant RG name: RSG + EU2 + MBBK + D + 01
 
   naming = {
     application_code = "MBBK"

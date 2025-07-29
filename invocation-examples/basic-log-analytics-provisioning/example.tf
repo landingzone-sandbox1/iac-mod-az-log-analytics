@@ -37,20 +37,20 @@ resource "azurerm_resource_group" "example" {
 locals {
   location_to_region_code = {
     # USA - Long forms (display names)
-    "East US"              = "EU1"
-    "East US 2"            = "EU2" 
-    "Central US"           = "CU1"
-    "North Central US"     = "NCU"
-    "South Central US"     = "SCU"
-    "West US"              = "WU1"
-    "West US 2"            = "WU2"
-    "West US 3"            = "WU3"
-    "Canada Central"       = "CC1"
-    "Canada East"          = "CE1"
-    "Brazil South"         = "BS1"
-    "Brazil Southeast"     = "BSE"
-    "Mexico Central"       = "MC1"
-    "Chile Central"        = "CL1"
+    "East US"          = "EU1"
+    "East US 2"        = "EU2"
+    "Central US"       = "CU1"
+    "North Central US" = "NCU"
+    "South Central US" = "SCU"
+    "West US"          = "WU1"
+    "West US 2"        = "WU2"
+    "West US 3"        = "WU3"
+    "Canada Central"   = "CC1"
+    "Canada East"      = "CE1"
+    "Brazil South"     = "BS1"
+    "Brazil Southeast" = "BSE"
+    "Mexico Central"   = "MC1"
+    "Chile Central"    = "CL1"
   }
 }
 

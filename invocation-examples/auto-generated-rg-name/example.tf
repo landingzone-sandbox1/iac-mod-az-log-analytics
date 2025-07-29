@@ -34,7 +34,7 @@ module "law_auto_rg_name" {
     # Resource group name will be auto-generated as: RSGEU2MBBKD01
     # (null means use computed ALZ name)
     resource_group_name = null
-    
+
     tags = {
       Environment = "Development"
       Purpose     = "Auto-generated RG name example"
@@ -46,9 +46,9 @@ module "law_auto_rg_name" {
 output "generated_names" {
   description = "Shows the auto-generated ALZ-compliant names"
   value = {
-    actual_rg_name     = module.law_auto_rg_name.resource_group_name
-    expected_rg_name   = module.law_auto_rg_name.resource_group_name_expected
-    law_name           = module.law_auto_rg_name.log_analytics_workspace_name
-    names_are_alz      = module.law_auto_rg_name.alz_names
+    actual_rg_name   = module.law_auto_rg_name.resource_group_name
+    expected_rg_name = module.law_auto_rg_name.resource_group_name_expected
+    law_name         = module.law_auto_rg_name.log_analytics_workspace_name
+    names_are_alz    = module.law_auto_rg_name.alz_names
   }
 }

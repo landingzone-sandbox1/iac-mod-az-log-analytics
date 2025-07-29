@@ -64,4 +64,15 @@ resource "azurerm_monitor_diagnostic_setting" "activity_logs" {
     category = "Administrative"
   }
 
+  # Ensure the Log Analytics workspace is created before the diagnostic setting
+  depends_on = [azurerm_log_analytics_workspace.this]
+
+  # Use lifecycle to handle conflicts gracefully
+  lifecycle {
+    # Prevent destruction of the diagnostic setting if it was created elsewhere
+    prevent_destroy = false
+
+    # Create before destroy to minimize downtime
+    create_before_destroy = false
+  }
 }

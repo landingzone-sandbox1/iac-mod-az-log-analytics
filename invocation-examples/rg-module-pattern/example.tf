@@ -61,7 +61,7 @@ module "law_actual" {
 
   log_analytics_config = {
     resource_group_name = azurerm_resource_group.alz_compliant.name
-    
+
     tags = {
       Environment = "Development"
       Purpose     = "RG Module Pattern"
