@@ -103,6 +103,10 @@ variable "log_analytics_config" {
       condition_version                      = optional(string, null)
       delegated_managed_identity_resource_id = optional(string, null)
     })), {})
+
+    # Diagnostic settings configuration
+    enable_diagnostic_settings = optional(bool, true)
+    diagnostic_settings        = optional(map(any), {})
   })
   description = <<DESCRIPTION
 Log Analytics Workspace configuration object containing all workspace settings:
@@ -126,6 +130,10 @@ Customer Managed Key:
 Identity & RBAC:
 - `identity` - (Optional) Managed identity configuration with type and identity_ids
 - `role_assignments` - (Optional) Map of RBAC role assignments (least-privilege enforced)
+
+Diagnostic Settings:
+- `enable_diagnostic_settings` - (Optional) Enable diagnostic settings for activity logs. Defaults to true.
+- `diagnostic_settings` - (Optional) Map of diagnostic settings configuration.
 
 Operations:
 - `timeouts` - (Optional) Terraform operation timeouts

@@ -50,7 +50,7 @@ resource "azurerm_role_assignment" "log_analytics_workspace" {
 data "azurerm_subscription" "current" {}
 
 resource "azurerm_monitor_diagnostic_setting" "activity_logs" {
-  count                          = var.naming.environment == "F" ? 1 : 0
+  count                          = var.naming.environment == "F" && var.log_analytics_config.enable_diagnostic_settings ? 1 : 0
   name                           = "${var.naming.application_code}-${var.naming.environment}-logs"
   target_resource_id             = data.azurerm_subscription.current.id
   log_analytics_workspace_id     = azurerm_log_analytics_workspace.this.id
