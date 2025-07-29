@@ -51,7 +51,7 @@ data "azurerm_subscription" "current" {}
 
 resource "azurerm_monitor_diagnostic_setting" "activity_logs" {
   count                          = var.naming.environment == "F" ? 1 : 0
-  name                           = "send-activity-logs"
+  name                           = "${var.naming.application_code}-${var.naming.environment}-logs"
   target_resource_id             = data.azurerm_subscription.current.id
   log_analytics_workspace_id     = azurerm_log_analytics_workspace.this.id
   log_analytics_destination_type = "Dedicated"
