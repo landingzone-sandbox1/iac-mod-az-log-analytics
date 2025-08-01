@@ -49,8 +49,41 @@ resource "azurerm_role_assignment" "log_analytics_workspace" {
 
 data "azurerm_subscription" "current" {}
 
+
+resource "azurerm_monitor_diagnostic_setting" "existing" {
+  count = var.naming.environment == "F" && var.log_analytics_config.enable_diagnostic_settings ? 1 : 0
+
+  #name               = "existing-diagnostic-setting"
+  name               = "${var.naming.application_code}-${var.naming.environment}-logs"
+  target_resource_id = data.azurerm_subscription.current.id
+
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.this.id
+
+  enabled_log {
+    category = "Security"
+  }
+
+  enabled_log {
+    category = "Administrative"
+  }
+}
+
+
 resource "azurerm_monitor_diagnostic_setting" "activity_logs" {
-  count                          = var.naming.environment == "F" && var.log_analytics_config.enable_diagnostic_settings ? 1 : 0
+  #count = var.naming.environment == "F" && var.log_analytics_config.enable_diagnostic_settings ? 1 : 0
+
+  # count = (
+  #   var.naming.environment == "F" &&
+  #   var.log_analytics_config.enable_diagnostic_settings &&
+  #   length(data.azurerm_monitor_diagnostic_setting.existing.settings) == 0
+  # ) ? 1 : 0
+
+  count = (
+    var.naming.environment == "F" &&
+    var.log_analytics_config.enable_diagnostic_settings &&
+    length(azurerm_monitor_diagnostic_setting.existing) == 0
+  ) ? 1 : 0
+
   name                           = "${var.naming.application_code}-${var.naming.environment}-logs"
   target_resource_id             = data.azurerm_subscription.current.id
   log_analytics_workspace_id     = azurerm_log_analytics_workspace.this.id
@@ -64,15 +97,17 @@ resource "azurerm_monitor_diagnostic_setting" "activity_logs" {
     category = "Administrative"
   }
 
-  # Ensure the Log Analytics workspace is created before the diagnostic setting
   depends_on = [azurerm_log_analytics_workspace.this]
 
-  # Use lifecycle to handle conflicts gracefully
   lifecycle {
     # Prevent destruction of the diagnostic setting if it was created elsewhere
     prevent_destroy = false
-
     # Create before destroy to minimize downtime
     create_before_destroy = false
+    ignore_changes = [
+      name,
+      target_resource_id,
+      log_analytics_workspace_id
+    ]
   }
 }
